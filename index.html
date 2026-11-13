@@ -5,6 +5,7 @@
 <meta name="viewport" content="width=device-width,initial-scale=1">
 <meta name="theme-color" content="#060a13">
 <title>Coolsplitwise</title>
+<script async src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
 <style>
 :root{--bg:#060a13;--card:rgba(18,26,46,.78);--line:rgba(110,160,255,.18);--tx:#e9efff;--mut:#8493b8;--c1:#22e3ff;--c2:#8b5cff;--pos:#2ef2a0;--neg:#ff5c8a;--mono:ui-monospace,Menlo,Consolas,monospace}
 *{box-sizing:border-box;-webkit-tap-highlight-color:transparent}
@@ -23,7 +24,7 @@ body:after{content:"";position:fixed;z-index:-1;width:70vmax;height:70vmax;left:
 @keyframes spark{to{transform:translate(var(--x),var(--y)) rotate(540deg);opacity:0}}
 #app{max-width:520px;margin:auto;padding:calc(20px + env(safe-area-inset-top)) 16px 170px}
 header{display:flex;align-items:center;justify-content:space-between;gap:10px;padding:6px 0 14px}
-.logo{font:800 17px/1 var(--mono);letter-spacing:.14em;display:flex;align-items:center;gap:9px;cursor:pointer}
+.logo{font:800 16px/1 var(--mono);letter-spacing:.12em;display:flex;align-items:center;gap:8px;cursor:pointer}
 .logo i{width:12px;height:12px;border-radius:3px;background:linear-gradient(135deg,var(--c1),var(--c2));box-shadow:0 0 14px var(--c1);animation:spin 5s linear infinite}
 .logo b{color:var(--c1)}
 button{font:inherit;color:inherit;border:0;background:none;cursor:pointer}
@@ -77,7 +78,7 @@ label{font-size:12px;color:var(--mut)}
 #sheet.open{display:flex}
 #panel{width:100%;max-width:520px;max-height:90vh;overflow:auto;padding:16px 18px calc(22px + env(safe-area-inset-bottom));background:#0c1324;border:1px solid var(--line);border-radius:24px 24px 0 0;animation:up .35s cubic-bezier(.2,.8,.2,1)}
 #panel h2{margin:0 0 10px;font-size:19px}
-.x{display:block;margin:0 0 8px auto;padding:8px 16px;border-radius:99px;border:1px solid var(--line);font-size:13px;color:var(--tx)}
+.x{display:block;margin:0 0 10px;padding:8px 16px;border-radius:99px;border:1px solid var(--c1);background:rgba(34,227,255,.1);font-size:14px;color:var(--tx)}
 #toast{position:fixed;left:50%;bottom:160px;transform:translate(-50%,20px);padding:10px 16px;border-radius:12px;background:#17213a;border:1px solid var(--line);opacity:0;transition:.25s;z-index:30;pointer-events:none;font-size:14px;max-width:88vw;text-align:center}
 #toast.show{opacity:1;transform:translate(-50%,0)}
 .bar{height:6px;border-radius:9px;background:rgba(255,255,255,.06);margin-top:6px;overflow:hidden}
@@ -89,6 +90,7 @@ label{font-size:12px;color:var(--mut)}
 .onb h1{font:800 28px/1.1 var(--mono);letter-spacing:.06em;margin:14px 0 0}
 .onb h1 span{color:var(--c1)}
 .ttl{font-weight:700;font-size:18px;text-align:center;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
+.ver{text-align:center;margin-top:22px}
 @media (prefers-reduced-motion:reduce){*,*:before,*:after{animation:none!important}}
 </style>
 </head>
@@ -123,9 +125,9 @@ const today=()=>new Date(Date.now()-new Date().getTimezoneOffset()*6e4).toISOStr
 const av=(id,sz=36)=>{const p=P(id);return `<span class="av" style="--c:${p.color};width:${sz}px;height:${sz}px;font-size:${Math.round(sz*.38)}px">${esc(p.name.trim().slice(0,2).toUpperCase())}</span>`};
 const empty=(a,b)=>`<div class="empty in"><b>${a}</b>${b}</div>`;
 function ago(ts){const m=Math.floor((Date.now()-ts)/6e4);return m<1?'just now':m<60?m+' min ago':m<1440?Math.floor(m/60)+' h ago':Math.floor(m/1440)+' d ago'}
-function log(txt){S.log.unshift({ts:Date.now(),txt})}
-function toast(t){const e=$('#toast');e.textContent=t;e.classList.add('show');clearTimeout(toast.t);toast.t=setTimeout(()=>e.classList.remove('show'),2200)}
-function sheet(h){$('#panel').innerHTML='<button class="x" onclick="closeSheet()">✕ Close</button>'+h;$('#sheet').classList.add('open')}
+function log(txt,gid,tid){S.log.unshift({ts:Date.now(),txt,gid:gid||null,tid:tid||null})}
+function toast(t){const e=$('#toast');e.textContent=t;e.classList.add('show');clearTimeout(toast.t);toast.t=setTimeout(()=>e.classList.remove('show'),2600)}
+function sheet(h){$('#panel').innerHTML='<button class="x" onclick="closeSheet()">‹ Back</button>'+h;$('#sheet').classList.add('open')}
 function closeSheet(){$('#sheet').classList.remove('open')}
 function done(){save();closeSheet();render()}
 function boom(){for(let i=0;i<26;i++){const e=document.createElement('i'),a=Math.random()*6.28,d=80+Math.random()*140;e.className='spark';e.style.cssText=`--c:${COLORS[i%8]};--x:${Math.cos(a)*d}px;--y:${Math.sin(a)*d}px`;document.body.appendChild(e);setTimeout(()=>e.remove(),900)}}
@@ -197,7 +199,8 @@ function render(){
 }
 function go(n,gid){V.name=n;if(gid)V.gid=gid;render();window.scrollTo(0,0)}
 function tab(t){V.tab=t;render()}
-const topBar=()=>`<header><div class="logo" onclick="go('home')"><i></i>COOL<b>SPLITWISE</b></div><button onclick="go('people')">${av(S.me)}</button></header>`;
+const backBtn=()=>`<button class="chip on" onclick="go('home')">‹ Back</button>`;
+const topBar=()=>`<header>${V.name==='home'?'':backBtn()}<div class="logo" onclick="go('home')"><i></i>COOL<b>SPLITWISE</b></div><button onclick="go('people')">${av(S.me)}</button></header>`;
 const nav=()=>`<nav>${[['home','Groups'],['activity','Activity'],['people','People']].map(n=>`<button class="${V.name===n[0]||(n[0]==='home'&&V.name==='group')?'on':''}" onclick="go('${n[0]}')">${n[1]}</button>`).join('')}</nav>`;
 
 function onboard(){return `<div class="onb in"><div class="logo"><i></i>COOL<b>SPLITWISE</b></div>
@@ -219,6 +222,7 @@ function home(){
   <div id="hero" class="big ${net>0?'pos':net<0?'neg':''}" data-v="${net}">${fmt(net)}</div>
   <div class="split2"><div><small>You are owed</small><b class="pos">${fmt(owed)}</b></div><div><small>You owe</small><b class="neg">${fmt(owe)}</b></div></div></section>
   <h3>Your groups</h3>${cards||empty('No groups yet','Create one for your trip and start adding expenses.')}
+  <small class="ver">Coolsplitwise v3</small>
   <button class="fab" onclick="groupSheet()">＋ New group</button>`;
 }
 
@@ -251,14 +255,29 @@ function group(){
     body=`<h3>By category</h3>`+(cs.map((c,i)=>`<div class="card row in" style="--i:${i}"><span class="emo">${CATS[c][0]}</span><span class="grow"><b>${CATS[c][1]}</b><div class="bar"><i style="--w:${Math.round(cat[c]/mx*100)}%"></i></div></span><span class="r">${fmt(cat[c])}</span></div>`).join('')||empty('No data yet','Add expenses to see the breakdown.'))
     +`<h3>By person</h3>`+g.members.map((m,i)=>`<div class="card row in" style="--i:${i}">${av(m)}<span class="grow"><b>${nm(m)}</b><small>paid ${fmt(paid[m]||0)} · share ${fmt(share[m]||0)}</small></span></div>`).join('');
   }
-  return `<header><button class="chip on" onclick="go('home')">‹ Home</button><div class="grow ttl">${g.emoji} ${esc(g.name)}</div><button class="chip" onclick="groupSheet('${g.id}')">Edit group</button></header>
+  return `<header>${backBtn()}<div class="grow ttl">${g.emoji} ${esc(g.name)}</div><button class="chip" onclick="groupSheet('${g.id}')">Edit group</button></header>
   <section class="hero in"><small>GROUP SPEND</small><div class="big" id="hero" data-v="${total}">${fmt(total)}</div>
   <div class="split2"><div><small>Your position</small><b class="${mine>0?'pos':mine<0?'neg':''}">${mine>0?'get back ':mine<0?'owe ':''}${fmt(Math.abs(mine))}</b></div><div><small>People</small><b>${g.members.length}</b></div></div></section>
   <div class="seg">${[['exp','Expenses'],['bal','Balances'],['st','Stats']].map(t=>`<button class="${V.tab===t[0]?'on':''}" onclick="tab('${t[0]}')">${t[1]}</button>`).join('')}</div>
-  ${body}<button class="fab" onclick="expSheet()">＋ Add expense</button>`;
+  ${body}
+  <button class="btn ghost" onclick="exportGroup()">⬇ Download Excel file</button>
+  <button class="fab" onclick="expSheet()">＋ Add expense</button>`;
 }
 
-function activity(){return `${topBar()}<h3>Activity</h3>${S.log.map((l,i)=>`<div class="card row in" style="--i:${Math.min(i,12)}"><span class="emo">⚡</span><span class="grow"><b style="white-space:normal">${esc(l.txt)}</b><small>${ago(l.ts)}</small></span></div>`).join('')||empty('Nothing yet','Your changes will show up here.')}`}
+function activity(){
+  const items=S.log.map((l,i)=>{
+    const g=l.gid&&G(l.gid), t=g&&l.tid&&g.tx.find(x=>x.id===l.tid);
+    return `<div class="card row in" style="--i:${Math.min(i,12)}"><span class="emo">⚡</span><span class="grow"><b style="white-space:normal">${esc(l.txt)}</b><small>${ago(l.ts)}</small></span>
+    ${g?`<span class="acts"><button class="chip on" onclick="openLog(${i})">${t?'Open / Edit':'Open group'}</button></span>`:''}</div>`}).join('');
+  return `${topBar()}<h3>Activity</h3>${items||empty('Nothing yet','Your changes will show up here.')}
+  ${S.log.length?`<button class="btn ghost" onclick="clearLog()">Clear activity history</button>`:''}`;
+}
+function openLog(i){
+  const l=S.log[i], g=l&&G(l.gid); if(!g)return toast('That group was deleted');
+  V.tab='exp'; go('group',g.id);
+  const t=l.tid&&g.tx.find(x=>x.id===l.tid); if(t&&t.type==='exp')expSheet(t.id);
+}
+function clearLog(){if(!confirm('Clear the activity history? Your expenses are not affected.'))return;S.log=[];save();render()}
 
 function people(){return `${topBar()}<h3>Profiles</h3>${S.people.map((p,i)=>`<div class="card row in" style="--i:${Math.min(i,12)}">${av(p.id)}<span class="grow"><b>${esc(p.name)}</b><small>${p.id===S.me?'Active profile (you)':'Friend'}</small></span>
 <span class="acts"><button class="chip" onclick="renameP('${p.id}')">Rename</button>${p.id===S.me?'':`<button class="chip on" onclick="useP('${p.id}')">Use as me</button><button class="chip del" onclick="delP('${p.id}')">Delete</button>`}</span></div>`).join('')}
@@ -310,7 +329,7 @@ function saveGroup(){
   if(GD.mem.size<2)return toast('Add at least 2 people');
   const members=S.people.map(p=>p.id).filter(i=>GD.mem.has(i));
   if(GD.id){const g=G(GD.id);g.name=GD.name.trim();g.emoji=GD.emoji;g.members=members}
-  else{const g={id:uid(),name:GD.name.trim(),emoji:GD.emoji,members,tx:[]};S.groups.push(g);log(`${P(S.me).name} created the group ${g.name}`);V.name='group';V.gid=g.id;V.tab='exp'}
+  else{const g={id:uid(),name:GD.name.trim(),emoji:GD.emoji,members,tx:[]};S.groups.push(g);log(`${P(S.me).name} created the group ${g.name}`,g.id);V.name='group';V.gid=g.id;V.tab='exp'}
   done();
 }
 function delGroup(id){
@@ -331,7 +350,7 @@ function expSheet(id){
   <div class="two"><label>Paid by<select onchange="D.by=this.value">${g.members.map(m=>`<option value="${m}" ${m===D.by?'selected':''}>${nm(m)}</option>`).join('')}</select></label>
   <label>Date<input type="date" value="${D.date}" onchange="D.date=this.value"></label></div>
   <div class="seg" id="modes"></div><div id="splitbox"></div><div id="rem" class="rem"></div>
-  <button class="btn" onclick="saveExp()">Save expense</button>${t?`<button class="btn ghost danger" onclick="delTx('${id}')">Delete expense</button>`:''}`);
+  <button class="btn" onclick="saveExp()">${t?'Save changes':'Save expense'}</button>${t?`<button class="btn ghost danger" onclick="delTx('${id}')">Delete expense</button>`:''}`);
   drawSplit();
 }
 function setCat(i){D.cat=i;document.querySelectorAll('#cats .chip').forEach((e,k)=>e.classList.toggle('on',k===i))}
@@ -355,14 +374,14 @@ function saveExp(){
   const g=D.g, i=g.tx.findIndex(x=>x.id===D.id);
   const t={id:D.id||uid(),type:'exp',desc:D.desc.trim(),amt:toC(D.amt),by:D.by,split:r.split,mode:D.mode,on:D.on,vals:D.vals,cat:D.cat,date:D.date||today(),ts:i>=0?g.tx[i].ts:Date.now()};
   if(i>=0)g.tx[i]=t;else g.tx.push(t);
-  log(`${P(S.me).name} ${i>=0?'edited':'added'} “${t.desc}” (${fmt(t.amt)}) in ${g.name}`);
+  log(`${P(S.me).name} ${i>=0?'edited':'added'} “${t.desc}” (${fmt(t.amt)}) in ${g.name}`,g.id,t.id);
   done();
 }
 function delTx(id){
   const g=G(V.gid), t=g.tx.find(x=>x.id===id); if(!t)return;
   if(!confirm('Delete this entry?'))return;
   g.tx=g.tx.filter(x=>x.id!==id);
-  log(`${P(S.me).name} deleted ${t.type==='pay'?'a payment':'“'+t.desc+'”'} in ${g.name}`); done();
+  log(`${P(S.me).name} deleted ${t.type==='pay'?'a payment':'“'+t.desc+'”'} in ${g.name}`,g.id); done();
 }
 
 /* ---------- settle up ---------- */
@@ -377,7 +396,52 @@ function savePay(){
   if(by===to)return toast('Pick two different people');
   if(amt<=0)return toast('Enter an amount');
   g.tx.push({id:uid(),type:'pay',by,to,amt,date:today(),ts:Date.now()});
-  log(`${P(by).name} paid ${P(to).name} ${fmt(amt)} in ${g.name}`); done(); boom();
+  log(`${P(by).name} paid ${P(to).name} ${fmt(amt)} in ${g.name}`,g.id); done(); boom();
+}
+
+/* ---------- Excel export ---------- */
+function saveFile(blob,name){
+  try{
+    const f=new File([blob],name,{type:blob.type});
+    if(window.matchMedia('(pointer:coarse)').matches&&navigator.canShare&&navigator.canShare({files:[f]})){
+      navigator.share({files:[f],title:name}).catch(()=>{}); return;
+    }
+  }catch(e){}
+  const a=document.createElement('a'); a.href=URL.createObjectURL(blob); a.download=name;
+  document.body.appendChild(a); a.click();
+  setTimeout(()=>{URL.revokeObjectURL(a.href);a.remove()},2000);
+}
+function exportGroup(){
+  const g=G(V.gid); if(!g)return;
+  const mem=g.members, b=balances(g), r=c=>c/100, byDate=(x,y)=>x.date.localeCompare(y.date)||x.ts-y.ts;
+  const exps=g.tx.filter(t=>t.type==='exp').sort(byDate), pays=g.tx.filter(t=>t.type==='pay').sort(byDate);
+  const s1=[['Date','Description','Category','Paid by','Amount',...mem.map(m=>P(m).name+' share')]];
+  exps.forEach(t=>s1.push([t.date,t.desc,CATS[t.cat][1],P(t.by).name,r(t.amt),...mem.map(m=>r(t.split[m]||0))]));
+  s1.push([]);
+  s1.push(['','','','TOTAL',r(sum(exps.map(t=>t.amt))),...mem.map(m=>r(sum(exps.map(t=>t.split[m]||0))))]);
+  const s2=[['Person','Paid for expenses','Share of expenses','Payments made','Payments received','Balance','Status']];
+  mem.forEach(m=>{
+    const v=b[m]||0;
+    s2.push([P(m).name,r(sum(exps.filter(t=>t.by===m).map(t=>t.amt))),r(sum(exps.map(t=>t.split[m]||0))),
+      r(sum(pays.filter(t=>t.by===m).map(t=>t.amt))),r(sum(pays.filter(t=>t.to===m).map(t=>t.amt))),r(v),v>0?'gets back':v<0?'owes':'settled']);
+  });
+  const s3=[['From','To','Amount']]; simplify(b).forEach(x=>s3.push([P(x.from).name,P(x.to).name,r(x.amt)]));
+  const s4=[['Date','Paid by','Paid to','Amount']]; pays.forEach(t=>s4.push([t.date,P(t.by).name,P(t.to).name,r(t.amt)]));
+  const sheets=[['Expenses',s1],['Balances',s2],['Who pays whom',s3],['Payments',s4]];
+  const base=(g.name.replace(/[^\w\- ]+/g,'').trim()||'group')+' - Coolsplitwise';
+  if(window.XLSX){
+    try{
+      const wb=XLSX.utils.book_new();
+      sheets.forEach(([n,d])=>XLSX.utils.book_append_sheet(wb,XLSX.utils.aoa_to_sheet(d),n));
+      const out=XLSX.write(wb,{bookType:'xlsx',type:'array'});
+      saveFile(new Blob([out],{type:'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet'}),base+'.xlsx');
+      return;
+    }catch(e){}
+  }
+  const cell=c=>'"'+String(c==null?'':c).replace(/"/g,'""')+'"';
+  const csv=sheets.map(([n,d])=>[n.toUpperCase()].concat(d.map(row=>row.map(cell).join(','))).join('\r\n')).join('\r\n\r\n');
+  saveFile(new Blob(['\ufeff'+csv],{type:'text/csv'}),base+'.csv');
+  toast('Excel component not loaded – saved a CSV file, which opens in Excel');
 }
 
 render();
