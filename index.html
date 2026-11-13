@@ -2,7 +2,7 @@
 <html lang="en">
 <head>
 <meta charset="utf-8">
-<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<meta name="viewport" content="width=device-width,initial-scale=1">
 <meta name="theme-color" content="#060a13">
 <title>Coolsplitwise</title>
 <style>
@@ -21,9 +21,9 @@ body:after{content:"";position:fixed;z-index:-1;width:70vmax;height:70vmax;left:
 @keyframes grow{from{width:0}}
 @keyframes pulse{50%{box-shadow:0 8px 40px -2px var(--c2)}}
 @keyframes spark{to{transform:translate(var(--x),var(--y)) rotate(540deg);opacity:0}}
-#app{max-width:520px;margin:auto;padding:14px 16px 160px}
+#app{max-width:520px;margin:auto;padding:calc(20px + env(safe-area-inset-top)) 16px 170px}
 header{display:flex;align-items:center;justify-content:space-between;gap:10px;padding:6px 0 14px}
-.logo{font:800 17px/1 var(--mono);letter-spacing:.14em;display:flex;align-items:center;gap:9px}
+.logo{font:800 17px/1 var(--mono);letter-spacing:.14em;display:flex;align-items:center;gap:9px;cursor:pointer}
 .logo i{width:12px;height:12px;border-radius:3px;background:linear-gradient(135deg,var(--c1),var(--c2));box-shadow:0 0 14px var(--c1);animation:spin 5s linear infinite}
 .logo b{color:var(--c1)}
 button{font:inherit;color:inherit;border:0;background:none;cursor:pointer}
@@ -37,18 +37,18 @@ small{display:block;color:var(--mut);font-size:12px}
 .split2{display:grid;grid-template-columns:1fr 1fr;gap:10px}
 .split2 b{font:700 15px var(--mono)}
 h3{font-size:12px;letter-spacing:.16em;text-transform:uppercase;color:var(--mut);margin:22px 2px 10px}
-.row{display:flex;align-items:center;gap:12px;width:100%;padding:13px 14px;margin-bottom:10px;text-align:left;transition:transform .15s}
-button.row:active{transform:scale(.98)}
+.row{display:flex;flex-wrap:wrap;align-items:center;gap:12px;width:100%;padding:13px 14px;margin-bottom:10px;text-align:left}
+.row[onclick]{cursor:pointer}
 .grow{flex:1;min-width:0}
 .grow b{display:block;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 .emo{font-size:22px;width:44px;height:44px;display:grid;place-items:center;border-radius:13px;background:rgba(34,227,255,.08);border:1px solid var(--line);flex:none}
 .r{text-align:right;font:700 13px var(--mono);white-space:nowrap}
 .r small{font-weight:400;font-family:system-ui,sans-serif}
+.acts{flex-basis:100%;display:flex;gap:8px;justify-content:flex-end}
 .in{animation:in .45s cubic-bezier(.2,.8,.2,1) both;animation-delay:calc(var(--i,0)*45ms)}
-.fab{position:fixed;left:50%;transform:translateX(-50%);bottom:84px;padding:14px 26px;border-radius:99px;font-weight:700;color:#04121c;background:linear-gradient(135deg,var(--c1),var(--c2));box-shadow:0 8px 30px -6px var(--c1);animation:pulse 2.4s infinite;z-index:5;white-space:nowrap}
-.fab.low{bottom:calc(24px + env(safe-area-inset-bottom))}
-nav{position:fixed;bottom:0;left:0;right:0;display:flex;justify-content:center;gap:6px;padding:8px 8px calc(8px + env(safe-area-inset-bottom));background:rgba(6,10,19,.88);backdrop-filter:blur(14px);-webkit-backdrop-filter:blur(14px);border-top:1px solid var(--line);z-index:6}
-nav button{flex:1;max-width:160px;padding:9px;border-radius:12px;color:var(--mut);font-size:13px}
+.fab{position:fixed;left:50%;transform:translateX(-50%);bottom:calc(84px + env(safe-area-inset-bottom));padding:14px 26px;border-radius:99px;font-weight:700;color:#04121c;background:linear-gradient(135deg,var(--c1),var(--c2));box-shadow:0 8px 30px -6px var(--c1);animation:pulse 2.4s infinite;z-index:5;white-space:nowrap}
+nav{position:fixed;bottom:0;left:0;right:0;display:flex;justify-content:center;gap:6px;padding:8px 8px calc(8px + env(safe-area-inset-bottom));background:rgba(6,10,19,.92);backdrop-filter:blur(14px);-webkit-backdrop-filter:blur(14px);border-top:1px solid var(--line);z-index:6}
+nav button{flex:1;max-width:160px;padding:11px 9px;border-radius:12px;color:var(--mut);font-size:14px;font-weight:600}
 nav button.on{color:var(--c1);background:rgba(34,227,255,.08)}
 .seg{display:flex;background:rgba(255,255,255,.04);border:1px solid var(--line);border-radius:12px;padding:3px;margin:14px 0}
 .seg button{flex:1;padding:8px 4px;border-radius:9px;font-size:13px;color:var(--mut)}
@@ -67,16 +67,18 @@ label{font-size:12px;color:var(--mut)}
 .amt{display:flex;align-items:center;gap:8px;font:800 26px var(--mono)}
 .amt input{font:800 26px var(--mono)}
 .chips{display:flex;gap:8px;overflow-x:auto;padding:6px 0}
-.chip{flex:none;padding:7px 12px;border-radius:99px;border:1px solid var(--line);font-size:13px;color:var(--mut)}
+.chip{flex:none;padding:7px 14px;border-radius:99px;border:1px solid var(--line);font-size:13px;color:var(--mut)}
 .chip.on{color:var(--tx);border-color:var(--c1);background:rgba(34,227,255,.1)}
+.chip.del{color:var(--neg);border-color:rgba(255,92,138,.4)}
 .prow{display:flex;align-items:center;gap:10px;padding:8px 2px;font-size:15px;color:var(--tx);border-bottom:1px solid rgba(255,255,255,.05)}
 .mini{width:96px;margin:0;padding:8px 10px;text-align:right}
 .rem{font-size:13px;margin:10px 2px;min-height:18px}
 #sheet{position:fixed;inset:0;z-index:20;background:rgba(2,5,12,.6);backdrop-filter:blur(6px);-webkit-backdrop-filter:blur(6px);display:none;align-items:flex-end;justify-content:center}
 #sheet.open{display:flex}
-#panel{width:100%;max-width:520px;max-height:92vh;overflow:auto;padding:20px 18px calc(22px + env(safe-area-inset-bottom));background:#0c1324;border:1px solid var(--line);border-radius:24px 24px 0 0;animation:up .35s cubic-bezier(.2,.8,.2,1)}
+#panel{width:100%;max-width:520px;max-height:90vh;overflow:auto;padding:16px 18px calc(22px + env(safe-area-inset-bottom));background:#0c1324;border:1px solid var(--line);border-radius:24px 24px 0 0;animation:up .35s cubic-bezier(.2,.8,.2,1)}
 #panel h2{margin:0 0 10px;font-size:19px}
-#toast{position:fixed;left:50%;bottom:150px;transform:translate(-50%,20px);padding:10px 16px;border-radius:12px;background:#17213a;border:1px solid var(--line);opacity:0;transition:.25s;z-index:30;pointer-events:none;font-size:14px;max-width:88vw;text-align:center}
+.x{display:block;margin:0 0 8px auto;padding:8px 16px;border-radius:99px;border:1px solid var(--line);font-size:13px;color:var(--tx)}
+#toast{position:fixed;left:50%;bottom:160px;transform:translate(-50%,20px);padding:10px 16px;border-radius:12px;background:#17213a;border:1px solid var(--line);opacity:0;transition:.25s;z-index:30;pointer-events:none;font-size:14px;max-width:88vw;text-align:center}
 #toast.show{opacity:1;transform:translate(-50%,0)}
 .bar{height:6px;border-radius:9px;background:rgba(255,255,255,.06);margin-top:6px;overflow:hidden}
 .bar i{display:block;height:100%;width:var(--w);border-radius:9px;background:linear-gradient(90deg,var(--c1),var(--c2));animation:grow .8s cubic-bezier(.2,.8,.2,1) both}
@@ -86,7 +88,7 @@ label{font-size:12px;color:var(--mut)}
 .onb{min-height:80vh;display:flex;flex-direction:column;justify-content:center;gap:6px}
 .onb h1{font:800 28px/1.1 var(--mono);letter-spacing:.06em;margin:14px 0 0}
 .onb h1 span{color:var(--c1)}
-.back{font-size:22px;padding:4px 6px 4px 0}
+.ttl{font-weight:700;font-size:18px;text-align:center;white-space:nowrap;overflow:hidden;text-overflow:ellipsis}
 @media (prefers-reduced-motion:reduce){*,*:before,*:after{animation:none!important}}
 </style>
 </head>
@@ -123,7 +125,7 @@ const empty=(a,b)=>`<div class="empty in"><b>${a}</b>${b}</div>`;
 function ago(ts){const m=Math.floor((Date.now()-ts)/6e4);return m<1?'just now':m<60?m+' min ago':m<1440?Math.floor(m/60)+' h ago':Math.floor(m/1440)+' d ago'}
 function log(txt){S.log.unshift({ts:Date.now(),txt})}
 function toast(t){const e=$('#toast');e.textContent=t;e.classList.add('show');clearTimeout(toast.t);toast.t=setTimeout(()=>e.classList.remove('show'),2200)}
-function sheet(h){$('#panel').innerHTML=h;$('#sheet').classList.add('open')}
+function sheet(h){$('#panel').innerHTML='<button class="x" onclick="closeSheet()">✕ Close</button>'+h;$('#sheet').classList.add('open')}
 function closeSheet(){$('#sheet').classList.remove('open')}
 function done(){save();closeSheet();render()}
 function boom(){for(let i=0;i<26;i++){const e=document.createElement('i'),a=Math.random()*6.28,d=80+Math.random()*140;e.className='spark';e.style.cssText=`--c:${COLORS[i%8]};--x:${Math.cos(a)*d}px;--y:${Math.sin(a)*d}px`;document.body.appendChild(e);setTimeout(()=>e.remove(),900)}}
@@ -190,13 +192,13 @@ function render(){
   const a=$('#app');
   if(!S.me){a.innerHTML=onboard();return}
   const html=VIEWS[V.name]();
-  a.innerHTML=html+(V.name==='group'?'':nav());
+  a.innerHTML=html+nav();
   const h=$('#hero'); if(h)countUp(h,+h.dataset.v);
 }
 function go(n,gid){V.name=n;if(gid)V.gid=gid;render();window.scrollTo(0,0)}
 function tab(t){V.tab=t;render()}
-const topBar=()=>`<header><div class="logo"><i></i>COOL<b>SPLITWISE</b></div><button onclick="go('people')">${av(S.me)}</button></header>`;
-const nav=()=>`<nav>${[['home','Groups'],['activity','Activity'],['people','People']].map(n=>`<button class="${V.name===n[0]?'on':''}" onclick="go('${n[0]}')">${n[1]}</button>`).join('')}</nav>`;
+const topBar=()=>`<header><div class="logo" onclick="go('home')"><i></i>COOL<b>SPLITWISE</b></div><button onclick="go('people')">${av(S.me)}</button></header>`;
+const nav=()=>`<nav>${[['home','Groups'],['activity','Activity'],['people','People']].map(n=>`<button class="${V.name===n[0]||(n[0]==='home'&&V.name==='group')?'on':''}" onclick="go('${n[0]}')">${n[1]}</button>`).join('')}</nav>`;
 
 function onboard(){return `<div class="onb in"><div class="logo"><i></i>COOL<b>SPLITWISE</b></div>
 <h1>Split trips.<br><span>Zero drama.</span></h1><small style="margin:8px 0 14px">Create your profile to start. Everything is saved on this device.</small>
@@ -208,14 +210,15 @@ function home(){
   let owed=0,owe=0;
   const cards=S.groups.map((g,i)=>{
     const b=balances(g)[S.me]||0; if(b>0)owed+=b; else owe-=b;
-    return `<button class="card row in" style="--i:${Math.min(i,12)}" onclick="go('group','${g.id}')"><span class="emo">${g.emoji}</span>
+    return `<div class="card row in" style="--i:${Math.min(i,12)}" onclick="go('group','${g.id}')"><span class="emo">${g.emoji}</span>
     <span class="grow"><b>${esc(g.name)}</b><small>${g.members.length} people · ${g.tx.length} entries</small></span>
-    <span class="r ${b>0?'pos':b<0?'neg':''}"><small>${b>0?'you get back':b<0?'you owe':'settled'}</small>${b?fmt(Math.abs(b)):''}</span></button>`}).join('');
+    <span class="r ${b>0?'pos':b<0?'neg':''}"><small>${b>0?'you get back':b<0?'you owe':'settled'}</small>${b?fmt(Math.abs(b)):''}</span>
+    <span class="acts"><button class="chip on" onclick="event.stopPropagation();go('group','${g.id}')">Open</button><button class="chip" onclick="event.stopPropagation();groupSheet('${g.id}')">Edit</button><button class="chip del" onclick="event.stopPropagation();delGroup('${g.id}')">Delete</button></span></div>`}).join('');
   const net=owed-owe;
   return `${topBar()}<section class="hero in"><small>NET BALANCE</small>
   <div id="hero" class="big ${net>0?'pos':net<0?'neg':''}" data-v="${net}">${fmt(net)}</div>
   <div class="split2"><div><small>You are owed</small><b class="pos">${fmt(owed)}</b></div><div><small>You owe</small><b class="neg">${fmt(owe)}</b></div></div></section>
-  <h3>Groups</h3>${cards||empty('No groups yet','Create one for your trip and start adding expenses.')}
+  <h3>Your groups</h3>${cards||empty('No groups yet','Create one for your trip and start adding expenses.')}
   <button class="fab" onclick="groupSheet()">＋ New group</button>`;
 }
 
@@ -226,11 +229,13 @@ function group(){
   if(V.tab==='exp'){
     body=[...g.tx].sort((x,y)=>y.date.localeCompare(x.date)||y.ts-x.ts).map((t,i)=>{
       const st=`style="--i:${Math.min(i,12)}"`;
-      if(t.type==='pay') return `<button class="card row in" ${st} onclick="paySheet('${t.id}')"><span class="emo">💸</span><span class="grow"><b>${nm(t.by)} paid ${nm(t.to)}</b><small>${t.date} · payment</small></span><span class="r">${fmt(t.amt)}</span></button>`;
+      if(t.type==='pay') return `<div class="card row in" ${st}><span class="emo">💸</span><span class="grow"><b>${nm(t.by)} paid ${nm(t.to)}</b><small>${t.date} · payment</small></span><span class="r">${fmt(t.amt)}</span>
+      <span class="acts"><button class="chip del" onclick="delTx('${t.id}')">Delete</button></span></div>`;
       const n=(t.by===S.me?t.amt:0)-(t.split[S.me]||0);
-      return `<button class="card row in" ${st} onclick="expSheet('${t.id}')"><span class="emo">${CATS[t.cat][0]}</span><span class="grow"><b>${esc(t.desc)}</b><small>${t.date} · ${nm(t.by)} paid ${fmt(t.amt)}</small></span>
-      <span class="r ${n>0?'pos':n<0?'neg':''}"><small>${n>0?'you lent':n<0?'you owe':'not involved'}</small>${n?fmt(Math.abs(n)):''}</span></button>`}).join('')
-      ||empty('No expenses yet','Tap “Add expense” to log the first one.');
+      return `<div class="card row in" ${st}><span class="emo">${CATS[t.cat][0]}</span><span class="grow"><b>${esc(t.desc)}</b><small>${t.date} · ${nm(t.by)} paid ${fmt(t.amt)}</small></span>
+      <span class="r ${n>0?'pos':n<0?'neg':''}"><small>${n>0?'you lent':n<0?'you owe':'not involved'}</small>${n?fmt(Math.abs(n)):''}</span>
+      <span class="acts"><button class="chip on" onclick="expSheet('${t.id}')">Edit</button><button class="chip del" onclick="delTx('${t.id}')">Delete</button></span></div>`}).join('')
+      ||empty('No expenses yet','Tap “Add expense” below to log the first one.');
   }else if(V.tab==='bal'){
     const mx=Math.max(1,...g.members.map(m=>Math.abs(b[m]||0))), s=simplify(b);
     body=g.members.map((m,i)=>{const v=b[m]||0;return `<div class="card row in" style="--i:${i}">${av(m)}<span class="grow"><b>${nm(m)}</b><div class="bar"><i style="--w:${Math.round(Math.abs(v)/mx*100)}%"></i></div></span>
@@ -246,17 +251,17 @@ function group(){
     body=`<h3>By category</h3>`+(cs.map((c,i)=>`<div class="card row in" style="--i:${i}"><span class="emo">${CATS[c][0]}</span><span class="grow"><b>${CATS[c][1]}</b><div class="bar"><i style="--w:${Math.round(cat[c]/mx*100)}%"></i></div></span><span class="r">${fmt(cat[c])}</span></div>`).join('')||empty('No data yet','Add expenses to see the breakdown.'))
     +`<h3>By person</h3>`+g.members.map((m,i)=>`<div class="card row in" style="--i:${i}">${av(m)}<span class="grow"><b>${nm(m)}</b><small>paid ${fmt(paid[m]||0)} · share ${fmt(share[m]||0)}</small></span></div>`).join('');
   }
-  return `<header><button class="back" onclick="go('home')">←</button><div class="grow" style="font-weight:700;font-size:18px">${g.emoji} ${esc(g.name)}</div><button onclick="groupSheet('${g.id}')">⚙️</button></header>
+  return `<header><button class="chip on" onclick="go('home')">‹ Home</button><div class="grow ttl">${g.emoji} ${esc(g.name)}</div><button class="chip" onclick="groupSheet('${g.id}')">Edit group</button></header>
   <section class="hero in"><small>GROUP SPEND</small><div class="big" id="hero" data-v="${total}">${fmt(total)}</div>
   <div class="split2"><div><small>Your position</small><b class="${mine>0?'pos':mine<0?'neg':''}">${mine>0?'get back ':mine<0?'owe ':''}${fmt(Math.abs(mine))}</b></div><div><small>People</small><b>${g.members.length}</b></div></div></section>
   <div class="seg">${[['exp','Expenses'],['bal','Balances'],['st','Stats']].map(t=>`<button class="${V.tab===t[0]?'on':''}" onclick="tab('${t[0]}')">${t[1]}</button>`).join('')}</div>
-  ${body}<button class="fab low" onclick="expSheet()">＋ Add expense</button>`;
+  ${body}<button class="fab" onclick="expSheet()">＋ Add expense</button>`;
 }
 
 function activity(){return `${topBar()}<h3>Activity</h3>${S.log.map((l,i)=>`<div class="card row in" style="--i:${Math.min(i,12)}"><span class="emo">⚡</span><span class="grow"><b style="white-space:normal">${esc(l.txt)}</b><small>${ago(l.ts)}</small></span></div>`).join('')||empty('Nothing yet','Your changes will show up here.')}`}
 
-function people(){return `${topBar()}<h3>Profiles</h3>${S.people.map((p,i)=>`<div class="card row in" style="--i:${Math.min(i,12)}">${av(p.id)}<span class="grow"><b>${esc(p.name)}</b><small>${p.id===S.me?'Active profile':'Tap Use to switch'}</small></span>
-<button class="chip" onclick="renameP('${p.id}')">Rename</button>${p.id===S.me?'':`<button class="chip on" onclick="useP('${p.id}')">Use</button>`}</div>`).join('')}
+function people(){return `${topBar()}<h3>Profiles</h3>${S.people.map((p,i)=>`<div class="card row in" style="--i:${Math.min(i,12)}">${av(p.id)}<span class="grow"><b>${esc(p.name)}</b><small>${p.id===S.me?'Active profile (you)':'Friend'}</small></span>
+<span class="acts"><button class="chip" onclick="renameP('${p.id}')">Rename</button>${p.id===S.me?'':`<button class="chip on" onclick="useP('${p.id}')">Use as me</button><button class="chip del" onclick="delP('${p.id}')">Delete</button>`}</span></div>`).join('')}
 <div class="two"><input id="pn" placeholder="New profile name"><button class="btn sm" onclick="newP()">Add</button></div>
 <h3>Settings</h3><label>Currency<select onchange="S.cur=this.value;save();render()">${['₹','$','€','£','¥'].map(c=>`<option ${c===S.cur?'selected':''}>${c}</option>`).join('')}</select></label>
 <button class="btn ghost" onclick="backup()">Copy backup code</button><button class="btn ghost" onclick="restoreSheet()">Restore from backup code</button>`}
@@ -270,6 +275,12 @@ function addPerson(n){
 function newP(){if(addPerson($('#pn').value)){save();render()}}
 function useP(id){S.me=id;save();render();toast('Now using '+P(id).name)}
 function renameP(id){const n=prompt('New name',P(id).name);if(n&&n.trim()){P(id).name=n.trim();save();render()}}
+function delP(id){
+  if(id===S.me)return toast('Switch to another profile first');
+  if(S.groups.some(g=>g.members.includes(id)))return toast('Remove this person from their groups first');
+  if(!confirm('Delete '+P(id).name+'?'))return;
+  S.people=S.people.filter(p=>p.id!==id);save();render();
+}
 function backup(){const s=JSON.stringify(S),show=()=>sheet(`<h2>Backup code</h2><small>Copy all of this text and keep it safe.</small><textarea readonly onfocus="this.select()">${esc(s)}</textarea>`);
   if(navigator.clipboard)navigator.clipboard.writeText(s).then(()=>toast('Backup code copied'),show);else show()}
 function restoreSheet(){sheet(`<h2>Restore</h2><small>Paste a backup code. This replaces everything on this device.</small><textarea id="rs" placeholder="Paste here"></textarea><button class="btn" onclick="doRestore()">Restore</button>`)}
@@ -302,7 +313,11 @@ function saveGroup(){
   else{const g={id:uid(),name:GD.name.trim(),emoji:GD.emoji,members,tx:[]};S.groups.push(g);log(`${P(S.me).name} created the group ${g.name}`);V.name='group';V.gid=g.id;V.tab='exp'}
   done();
 }
-function delGroup(){const g=G(GD.id);if(!confirm(`Delete "${g.name}" and all its entries?`))return;S.groups=S.groups.filter(x=>x.id!==g.id);log(`${P(S.me).name} deleted the group ${g.name}`);V.name='home';done()}
+function delGroup(id){
+  const g=G(id||(GD&&GD.id)); if(!g)return;
+  if(!confirm(`Delete "${g.name}" and all its entries?`))return;
+  S.groups=S.groups.filter(x=>x.id!==g.id);log(`${P(S.me).name} deleted the group ${g.name}`);V.name='home';done();
+}
 
 /* ---------- expenses ---------- */
 function expSheet(id){
@@ -344,8 +359,9 @@ function saveExp(){
   done();
 }
 function delTx(id){
+  const g=G(V.gid), t=g.tx.find(x=>x.id===id); if(!t)return;
   if(!confirm('Delete this entry?'))return;
-  const g=G(V.gid), t=g.tx.find(x=>x.id===id); g.tx=g.tx.filter(x=>x.id!==id);
+  g.tx=g.tx.filter(x=>x.id!==id);
   log(`${P(S.me).name} deleted ${t.type==='pay'?'a payment':'“'+t.desc+'”'} in ${g.name}`); done();
 }
 
@@ -363,8 +379,6 @@ function savePay(){
   g.tx.push({id:uid(),type:'pay',by,to,amt,date:today(),ts:Date.now()});
   log(`${P(by).name} paid ${P(to).name} ${fmt(amt)} in ${g.name}`); done(); boom();
 }
-function paySheet(id){const t=G(V.gid).tx.find(x=>x.id===id);
-  sheet(`<h2>Payment</h2><p>${nm(t.by)} paid ${nm(t.to)} <b>${fmt(t.amt)}</b> on ${t.date}.</p><button class="btn ghost danger" onclick="delTx('${id}')">Delete payment</button>`)}
 
 render();
 </script>
