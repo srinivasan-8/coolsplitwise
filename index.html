@@ -1,4 +1,3 @@
-
 <!DOCTYPE html>
 <html lang="en">
 <head>
@@ -196,7 +195,7 @@ function render(){
 }
 function go(n,gid){V.name=n;if(gid)V.gid=gid;render();window.scrollTo(0,0)}
 function tab(t){V.tab=t;render()}
-const top=()=>`<header><div class="logo"><i></i>COOL<b>SPLITWISE</b></div><button onclick="go('people')">${av(S.me)}</button></header>`;
+const topBar=()=>`<header><div class="logo"><i></i>COOL<b>SPLITWISE</b></div><button onclick="go('people')">${av(S.me)}</button></header>`;
 const nav=()=>`<nav>${[['home','Groups'],['activity','Activity'],['people','People']].map(n=>`<button class="${V.name===n[0]?'on':''}" onclick="go('${n[0]}')">${n[1]}</button>`).join('')}</nav>`;
 
 function onboard(){return `<div class="onb in"><div class="logo"><i></i>COOL<b>SPLITWISE</b></div>
@@ -213,7 +212,7 @@ function home(){
     <span class="grow"><b>${esc(g.name)}</b><small>${g.members.length} people · ${g.tx.length} entries</small></span>
     <span class="r ${b>0?'pos':b<0?'neg':''}"><small>${b>0?'you get back':b<0?'you owe':'settled'}</small>${b?fmt(Math.abs(b)):''}</span></button>`}).join('');
   const net=owed-owe;
-  return `${top()}<section class="hero in"><small>NET BALANCE</small>
+  return `${topBar()}<section class="hero in"><small>NET BALANCE</small>
   <div id="hero" class="big ${net>0?'pos':net<0?'neg':''}" data-v="${net}">${fmt(net)}</div>
   <div class="split2"><div><small>You are owed</small><b class="pos">${fmt(owed)}</b></div><div><small>You owe</small><b class="neg">${fmt(owe)}</b></div></div></section>
   <h3>Groups</h3>${cards||empty('No groups yet','Create one for your trip and start adding expenses.')}
@@ -254,9 +253,9 @@ function group(){
   ${body}<button class="fab low" onclick="expSheet()">＋ Add expense</button>`;
 }
 
-function activity(){return `${top()}<h3>Activity</h3>${S.log.map((l,i)=>`<div class="card row in" style="--i:${Math.min(i,12)}"><span class="emo">⚡</span><span class="grow"><b style="white-space:normal">${esc(l.txt)}</b><small>${ago(l.ts)}</small></span></div>`).join('')||empty('Nothing yet','Your changes will show up here.')}`}
+function activity(){return `${topBar()}<h3>Activity</h3>${S.log.map((l,i)=>`<div class="card row in" style="--i:${Math.min(i,12)}"><span class="emo">⚡</span><span class="grow"><b style="white-space:normal">${esc(l.txt)}</b><small>${ago(l.ts)}</small></span></div>`).join('')||empty('Nothing yet','Your changes will show up here.')}`}
 
-function people(){return `${top()}<h3>Profiles</h3>${S.people.map((p,i)=>`<div class="card row in" style="--i:${Math.min(i,12)}">${av(p.id)}<span class="grow"><b>${esc(p.name)}</b><small>${p.id===S.me?'Active profile':'Tap Use to switch'}</small></span>
+function people(){return `${topBar()}<h3>Profiles</h3>${S.people.map((p,i)=>`<div class="card row in" style="--i:${Math.min(i,12)}">${av(p.id)}<span class="grow"><b>${esc(p.name)}</b><small>${p.id===S.me?'Active profile':'Tap Use to switch'}</small></span>
 <button class="chip" onclick="renameP('${p.id}')">Rename</button>${p.id===S.me?'':`<button class="chip on" onclick="useP('${p.id}')">Use</button>`}</div>`).join('')}
 <div class="two"><input id="pn" placeholder="New profile name"><button class="btn sm" onclick="newP()">Add</button></div>
 <h3>Settings</h3><label>Currency<select onchange="S.cur=this.value;save();render()">${['₹','$','€','£','¥'].map(c=>`<option ${c===S.cur?'selected':''}>${c}</option>`).join('')}</select></label>
